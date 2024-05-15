@@ -1,32 +1,16 @@
-// import { Module } from '@nestjs/common';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-// import { ConfigModule } from '@nestjs/config'; // Import ConfigModule
-// import { AuthModule } from './auth/auth.module';
-
-// @Module({
-//   imports: [
-//     ConfigModule.forRoot(), // Import ConfigModule to access environment variables
-//     AuthModule
-//   ],
-//   controllers: [AppController],
-//   providers: [AppService],
-// })
-// export class AppModule {}
-
-
+// app.module.ts
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { User, UserSchema } from './auth/user.model';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Import ConfigModule to access environment variables
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     AuthModule,
   ],
-  controllers: [AppController], // Include AppController
-  providers: [AppService], // Include AppService
 })
 export class AppModule {}
