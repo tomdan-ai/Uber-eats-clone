@@ -1,23 +1,32 @@
-// auth.service.ts
-import { Injectable } from '@nestjs/common';
+// auth/auth.service.ts
+
+import { Injectable, Logger } from '@nestjs/common';
+
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from './user.model';
 
 @Injectable()
 export class AuthService {
-  // Dummy user data for testing
-  private readonly users = [
-    { id: 1, email: 'test@example.com', username: 'user', password: 'password' },
-  ];
+  private readonly logger = new Logger(AuthService.name)
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    // Find user by email
-    const user = this.users.find(user => user.email === email);
-    
-    // If user not found or password doesn't match, return null
-    if (!user || user.password !== password) {
+    this.logger.log(`Validating user with email: ${email}`); // Log at the "log" level
+  
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      this.logger.warn(`User not found with email: ${email}`); // Log at the "warn" level
       return null;
     }
-
-    // If user found and password matches, return user
+  
+    if (user.password !== password) {
+      this.logger.error(`Invalid password for user: ${user.email}`); // Log at the "error" level
+      return null;
+    }
+  
+    this.logger.debug(`User authenticated: ${user.email}`); // Log at the "debug" level
+  
     return user;
   }
 
@@ -38,8 +47,8 @@ export class AuthService {
     }
 
     // Placeholder for user creation logic
-    const newUser = { id: this.users.length + 1, email, username, password };
-    this.users.push(newUser);
+    const newUser = new this.userModel({ email, username, password });
+    return newUser.save();
 
     return newUser;
   }
