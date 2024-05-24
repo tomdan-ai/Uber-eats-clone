@@ -18,5 +18,12 @@
     "forceConsistentCasingInFileNames": false,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
